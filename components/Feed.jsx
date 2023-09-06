@@ -34,11 +34,13 @@ const Feed = () => {
 		fetchPosts();
 	}, []);
 
-	const filterPrompts = (searchText) => {
+	const filterPrompts = (searchText, filterByTag = false) => {
 		const regexString = new RegExp(searchText, 'i');
 
+		if (filterByTag) return allPosts.filter((post) => regexString.test(post.tag));
+
 		return allPosts.filter(
-			(post) => regexString.test(post.tag) || regexString.test(post.prompt) || regexString.test(post.creator.username)
+			(post) => regexString.test(post.creator.username) || regexString.test(post.tag) || regexString.test(post.prompt)
 		);
 	};
 
@@ -54,6 +56,14 @@ const Feed = () => {
 		);
 	};
 
+	const handleTagClick = (tag) => {
+		setSearchText(tag);
+
+		const filterResults = filterPrompts(tag, true);
+
+		setFilteredPosts(filterResults);
+	};
+
 	return (
 		<section className='feed'>
 			<form className='relative w-full flex-center'>
@@ -66,10 +76,10 @@ const Feed = () => {
 				/>
 			</form>
 
-			{filteredPosts.length >= 1 ? (
-				<PromptCardList data={filteredPosts} handleTagClick={() => {}} />
+			{searchText ? (
+				<PromptCardList data={filteredPosts} handleTagClick={handleTagClick} />
 			) : (
-				<PromptCardList data={allPosts} handleTagClick={() => {}} />
+				<PromptCardList data={allPosts} handleTagClick={handleTagClick} />
 			)}
 		</section>
 	);
